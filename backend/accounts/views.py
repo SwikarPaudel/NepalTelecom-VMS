@@ -12,6 +12,7 @@ from rest_framework.exceptions import NotFound
 from .adminserializer import AdminUserProfileManagementSerializer 
 from rest_framework.pagination import PageNumberPagination
 from rest_framework.generics import CreateAPIView
+from core.pagination import AdminProfileTablePagination
 
 class RegisterUserView(CreateAPIView):
     """API view to handle user registration requests."""

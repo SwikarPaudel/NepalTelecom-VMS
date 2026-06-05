@@ -8,7 +8,7 @@ class UserRegistrationSerializer(serializers.ModelSerializer):
     email = serializers.EmailField(required=True)
 
     #Capture custom profile details
-    requested_role = serializers.ChoiceField(choices=Profile.ROLE.choices,default=Profile.ROLE.NOT_ASSIGNED, required=True)
+    requested_role = serializers.ChoiceField(choices=Profile.ROLE.choices,default=Profile.ROLE.NOT_ASSIGNED)
     phone_number = serializers.CharField(max_length=10, required=False, allow_blank=True)
 
     class Meta:

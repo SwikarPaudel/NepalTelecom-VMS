@@ -5,7 +5,7 @@ from rest_framework.permissions import AllowAny, IsAdminUser,IsAuthenticated
 from rest_framework.views import APIView, Response, status
 from .models import Profile
 from core.permissions import IsSuperAdmin,IsBranchAdmin
-from core.filters import BranchFilterBackend
+# from core.filters import BranchFilterBackend
 from django.contrib.auth import authenticate
 from rest_framework_simplejwt.tokens import RefreshToken
 from rest_framework.exceptions import NotFound
@@ -36,14 +36,14 @@ class RegisterUserView(CreateAPIView):
 class UserProfileViewSet(ModelViewSet):
     """API viewset to handle user profile operations."""
     permission_classes = [IsAuthenticated,]  
-    filter_backends = [BranchFilterBackend]
+    # filter_backends = [BranchFilterBackend]
     queryset = Profile.objects.all()
     serializer_class = userProfileSerializer
 
 class UserProfileViewSet(ModelViewSet):
     """API viewset to handle user profile operations."""
     permission_classes = [IsAuthenticated,]  
-    filter_backends = [BranchFilterBackend]
+    # filter_backends = [BranchFilterBackend]
     queryset = Profile.objects.all()
     serializer_class = userProfileSerializer
 
@@ -98,7 +98,7 @@ class AdminProfileManagementViewSet(ModelViewSet):
     """Admin-only viewset to view, update, list, and delete any user profile."""
     permission_classes = [IsBranchAdmin] # Strictly restricts to staff/admins
     queryset = Profile.objects.all().select_related('user', 'approved_by__user')
-    filter_backends = [BranchFilterBackend]
+    # filter_backends = [BranchFilterBackend]
     serializer_class = AdminUserProfileManagementSerializer
     pagination_class = AdminProfileTablePagination
 

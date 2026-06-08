@@ -51,7 +51,7 @@ class userProfileSerializer(serializers.ModelSerializer):
     approved_by=serializers.ReadOnlyField(source='approved_by.user.username')
     class Meta:
         model = Profile
-        fields = ['user','username', 'role', 'role_approved', 'phone_number', 'approved_by']
+        fields = ['user','username', 'role', 'role_approved', 'phone_number', 'branch', 'approved_by']
 
 
 class UserProfileDetailSerializer(serializers.ModelSerializer):
@@ -64,7 +64,7 @@ class UserProfileDetailSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Profile
-        fields = ['user', 'username', 'email', 'first_name', 'last_name', 'role', 'role_approved', 'phone_number', 'approved_by']
+        fields = ['user', 'username', 'email', 'first_name', 'last_name', 'role', 'role_approved', 'phone_number', 'branch', 'approved_by']
         
         # Security: Prevent standard users from escalating privileges or changing groups
         read_only_fields = ['user', 'role', 'role_approved', 'branch', 'approved_by']

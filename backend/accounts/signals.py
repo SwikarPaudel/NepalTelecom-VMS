@@ -2,7 +2,7 @@ from django.db.models.signals import post_save
 from django.dispatch import receiver
 from .models import Profile
 from django.contrib.auth.models import User
-# # from driver.models import DriverProfile as Driver
+from driver.models import DriverProfile as Driver
 
 
 
@@ -20,13 +20,13 @@ def create_user_profile(sender, instance, created, **kwargs):
             }
         )
 
-# @receiver(post_save, sender=Profile)
-# def sync_driver_profile(sender, instance, created, **kwargs):
-#     """Signal to create or delete a DriverProfile based on the Profile's role and approval status."""
+@receiver(post_save, sender=Profile)
+def sync_driver_profile(sender, instance, created, **kwargs):
+    """Signal to create or delete a DriverProfile based on the Profile's role and approval status."""
     
-#     if instance.role == Profile.ROLE.DRIVER and instance.role_approved:
-#         print("-> Condition MET: Creating/Getting Driver row.")
-#         Driver.objects.get_or_create(user=instance)
-#     else:
-#         print("-> Condition FAILED: Deleting Driver row if it exists.")
-#         Driver.objects.filter(user=instance).delete()
+    if instance.role == Profile.ROLE.DRIVER and instance.role_approved:
+        print("-> Condition MET: Creating/Getting Driver row.")
+        Driver.objects.get_or_create(user=instance)
+    else:
+        print("-> Condition FAILED: Deleting Driver row if it exists.")
+        Driver.objects.filter(user=instance).delete()

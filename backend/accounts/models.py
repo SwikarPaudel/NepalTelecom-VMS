@@ -17,6 +17,7 @@ class Profile(models.Model):
     role = models.CharField(max_length=20, choices=ROLE.choices, default=ROLE.NOT_ASSIGNED)
     role_approved = models.BooleanField(default=False)
     phone_number = models.CharField(max_length=10, blank=True, null=True) 
+    branch = models.ForeignKey('branch.Branch', on_delete=models.SET_NULL, null=True, blank=True)
 
     # FIX: Uses __in to allow multiple roles to approve profiles
     approved_by = models.ForeignKey(

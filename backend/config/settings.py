@@ -48,6 +48,7 @@ INSTALLED_APPS = [
     'branch',
     'driver',
     'fleet',
+    'bookings',
 ]
 
 MIDDLEWARE = [

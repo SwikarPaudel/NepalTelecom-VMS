@@ -45,6 +45,9 @@ INSTALLED_APPS = [
     #apps
     'accounts',
     'core',
+    'branch',
+    'driver',
+    'fleet',
 ]
 
 MIDDLEWARE = [

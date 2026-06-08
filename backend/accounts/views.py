@@ -91,7 +91,7 @@ class AdminProfileManagementViewSet(ModelViewSet):
     """Admin-only viewset to view, update, list, and delete any user profile."""
     permission_classes = [IsBranchAdmin] # Strictly restricts to staff/admins
     queryset = Profile.objects.all().select_related('user', 'approved_by__user')
-    # filter_backends = [BranchFilterBackend]
+    filter_backends = [BranchFilterBackend]
     serializer_class = AdminUserProfileManagementSerializer
     pagination_class = AdminProfileTablePagination
 

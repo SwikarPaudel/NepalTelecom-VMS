@@ -16,7 +16,7 @@ class BookingSerializer(serializers.ModelSerializer):
         user = request.user
 
         # Fetch the branch from user profile (your existing code logic)
-        user_branch = user.accounts.branch 
+        user_branch = user.profile.branch 
 
         # ... your existing matching verification logic ...
 
@@ -30,8 +30,8 @@ class BookingSerializer(serializers.ModelSerializer):
 class BookingApprovalSerializer(serializers.ModelSerializer):
     class Meta:
         model = Booking
-        fields = ['id', 'status', 'approved_by', 'vehicle', 'assigned_vehicle', 'assigned_driver']
-        read_only_fields = ['id', 'approved_by', 'vehicle']
+        fields = ['id', 'user', 'status', 'approved_by', 'vehicle', 'assigned_vehicle', 'assigned_driver']
+        read_only_fields = ['id', 'user',' approved_by', 'vehicle']
 
     def update(self, instance, validated_data):
         request = self.context.get('request')

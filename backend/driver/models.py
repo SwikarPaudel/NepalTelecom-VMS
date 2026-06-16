@@ -19,9 +19,25 @@ class DriverProfile(models.Model):
     branch = models.ForeignKey('branch.Branch', on_delete=models.SET_NULL, null=True, blank=True)
 
     
+    # def __str__(self):
+    #     # Optimized to avoid double-join database hits if Profile holds identifying strings
+    #     return f"Driver: {self.user_id} -{self.user.username} {self.driver_status}"
     def __str__(self):
-        # Optimized to avoid double-join database hits if Profile holds identifying strings
-        return f"Driver: {self.user_id} - {self.driver_status}"
+        # 1. Access the underlying Django User model through the Profile relationship
+        if self.user and hasattr(self.user, 'user'):
+            django_user = self.user.user
+            full_name = f"{django_user.first_name} {django_user.last_name}".strip()
+            # Use full name if available; otherwise fall back to username
+            driver_name = full_name if full_name else django_user.username
+        elif self.user and hasattr(self.user, 'username'):
+            # Fallback if username directly exists on the object
+            driver_name = self.user.username
+        else:
+            # Absolute fallback to ID to prevent the admin panel from crashing
+            driver_name = f"ID {self.user_id}"
+
+        # 2. Return the clean string with your current status formatting
+        return f"Driver: {driver_name} - {self.driver_status}"
 
 
 class Dispatches(models.Model):

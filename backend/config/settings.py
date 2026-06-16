@@ -12,6 +12,7 @@ https://docs.djangoproject.com/en/6.0/ref/settings/
 
 from datetime import timedelta
 from pathlib import Path
+import os
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -52,6 +53,7 @@ INSTALLED_APPS = [
 ]
 
 MIDDLEWARE = [
+    'corsheaders.middleware.CorsMiddleware',
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
@@ -131,11 +133,16 @@ SIMPLE_JWT = {
     'REFRESH_TOKEN_LIFETIME': timedelta(days=1),     # Adjust as needed
 }
 
-REST_FRAMEWORK = {
-    'DEFAULT_AUTHENTICATION_CLASSES': (
-        'rest_framework_simplejwt.authentication.JWTAuthentication',
-        'rest_framework.authentication.SessionAuthentication',
-    )
+SIMPLE_JWT = {
+    # Access tokens are sent with every API request (Keep this relatively short)
+    "ACCESS_TOKEN_LIFETIME": timedelta(hours=1),  # Increased from default 5 mins
+    
+    # Refresh tokens are used to get a new access token without logging in again
+    "REFRESH_TOKEN_LIFETIME": timedelta(days=1),  # Increased from default 1 day
+    
+    # Optional but recommended settings:
+    "ROTATE_REFRESH_TOKENS": True,   # Gives a new refresh token when used
+    "BLACKLIST_AFTER_ROTATION": True, # Prevents old refresh tokens from being reused
 }
 
 
@@ -143,3 +150,9 @@ REST_FRAMEWORK = {
 # https://docs.djangoproject.com/en/6.0/howto/static-files/
 
 STATIC_URL = 'static/'
+
+# The actual folder on your server machine where images are saved
+MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
+
+# The URL prefix the frontend uses to request the images
+MEDIA_URL = '/media/'

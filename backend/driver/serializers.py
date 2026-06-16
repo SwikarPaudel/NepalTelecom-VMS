@@ -1,5 +1,6 @@
 from rest_framework import serializers
-from .models import DriverProfile
+from .models import Dispatches, DriverProfile
+from fleet.models import Vehicle
 
 class DriverProfileFirstTimeSetupSerializer(serializers.ModelSerializer):
     class Meta:
@@ -76,3 +77,68 @@ class AdminDriverProfileManagementSerializer(serializers.ModelSerializer):
         
         # This super call now exclusively updates address, license info, status, or branch
         return super().update(instance, validated_data)
+
+
+class DriverVehicleInfoSerializer(serializers.ModelSerializer):
+    class Meta:
+        model=Vehicle
+        fields=['manufacturer','model','year','license_plate','approval_status','current_driver']
+        read_only_fields=['manufacturer','model','year','license_plate','approval_status','current_driver']
+
+    def to_representation(self, instance):
+        representation = super().to_representation(instance)
+
+       
+        representation['current_driver'] = instance.current_driver.user.user.username if instance.current_driver else None
+
+        return representation
+
+
+class DispatchSerializers(serializers.ModelSerializer):
+    driver_name = serializers.ReadOnlyField(source='driver.user.user.username')
+    driver_status = serializers.ReadOnlyField(source='driver.driver_status')
+    vehicle_manufacturer = serializers.ReadOnlyField(source='vehicle.manufacturer')
+    vehicle_model = serializers.ReadOnlyField(source='vehicle.model')
+    vehicle_license_plate = serializers.ReadOnlyField(source='vehicle.license_plate')
+    booking_start_time = serializers.ReadOnlyField(source='booking.start_time')
+    booking_end_time = serializers.ReadOnlyField(source='booking.end_time')
+    booking_purpose = serializers.ReadOnlyField(source='booking.purpose')
+    booking_user = serializers.ReadOnlyField(source='booking.user.username')
+    booking_status = serializers.ReadOnlyField(source='booking.status')
+
+    class Meta:
+        model = Dispatches
+        # Combined all fields so it handles both manual writes and descriptive reads
+        fields = [
+            'id', 'booking', 'booking_user', 'booking_purpose',
+            'booking_status', 'driver', 'driver_name', 'driver_status',
+            'vehicle', 'vehicle_manufacturer', 'vehicle_model', 'vehicle_license_plate',
+            'booking_start_time', 'booking_end_time'
+        ]
+        read_only_fields = ['id']
+
+    def validate(self, attrs):
+        # 1. During a PATCH/partial update request, fields might be missing from attrs.
+        # Fall back to the existing instance values if they aren't part of the incoming request body.
+        driver = attrs.get('driver', getattr(self.instance, 'driver', None))
+        booking = attrs.get('booking', getattr(self.instance, 'booking', None))
+        
+        # 2. Extract active row ID if executing an update tracking transaction
+        dispatch_id = self.instance.id if self.instance else None
+
+        if driver and booking:
+            driver_branch = getattr(driver, 'branch', None) or getattr(getattr(driver, 'user', None), 'branch', None)
+            booking_branch = getattr(getattr(booking, 'vehicle', None), 'branch', None) or getattr(getattr(getattr(booking, 'user', None), 'profile', None), 'branch', None)
+
+            if driver_branch is not None and booking_branch is not None and driver_branch != booking_branch:
+                raise serializers.ValidationError({
+                    "driver": "This driver must belong to the same branch as the booking vehicle."
+                })
+
+            # 3. Trigger the interval math logic check on the model layer
+            if not driver.is_available_during(booking.start_time, booking.end_time, exclude_dispatch_id=dispatch_id):
+                raise serializers.ValidationError({
+                    "driver": "This driver is already assigned to another approved trip during this schedule timeframe."
+                })
+                
+        return attrs

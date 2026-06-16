@@ -57,7 +57,40 @@ class VehicleListUpdateSerializer(serializers.ModelSerializer):
 class AssignDriverSerializer(serializers.ModelSerializer):
     class Meta:
         model = Vehicle
-        fields = ('id', 'current_driver')
+        # Include all fields you want to show in the API response
+        fields = [
+            'id', 'manufacturer', 'model', 'year', 
+            'license_plate', 'approval_status', 
+         'branch', 'current_driver'
+        ]
+        # Make everything read-only except 'current_driver'
+        read_only_fields = [
+            'id', 'manufacturer', 'model', 'year', 
+            'license_plate', 'approval_status', 'branch'
+        ]
 
-    #assign drivers by admin is left
+    def validate_current_driver(self, value):
+        # If the request is clearing the driver (setting to null), allow it
+        if value is None:
+            return value
+
+        # Check if this driver is already assigned to a different vehicle
+        vehicle_instance = self.instance
+        existing_vehicle = Vehicle.objects.filter(current_driver=value).exclude(pk=vehicle_instance.pk).first()
+        
+        if existing_vehicle:
+            raise serializers.ValidationError(
+                f"This driver is already assigned to another vehicle ({existing_vehicle.manufacturer} {existing_vehicle.model})."
+            )
+            
+        return value
+    
+    def to_representation(self, instance):
+        representation = super().to_representation(instance)
+        
+        # Pull details from the related user object securely if it exists
+        if instance.current_driver:
+            representation['current_driver'] = instance.current_driver.user.user.username
+            
+        return representation
     

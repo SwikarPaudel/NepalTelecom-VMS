@@ -66,3 +66,6 @@ cover/
 *~
 .DS_Store
 Thumbs.db
+
+#License files
+media

@@ -1,13 +1,13 @@
 from django.shortcuts import render
 from rest_framework.views import APIView
 from rest_framework.viewsets import ModelViewSet
-from rest_framework.generics import CreateAPIView
+from rest_framework.generics import CreateAPIView, RetrieveUpdateAPIView
 from rest_framework.response import Response
 from rest_framework import status
 from rest_framework.permissions import IsAuthenticated
 from core.filters import BranchFilterBackend
 from core.permissions import IsBranchAdmin
-from .serializers import VehicleSerializer
+from .serializers import VehicleSerializer, AssignDriverSerializer
 from .models import Vehicle
 
 # Create your views here.
@@ -59,9 +59,9 @@ class VehicleListView(ModelViewSet):
         return Response(serializer.data, status=status.HTTP_200_OK)
     
 
-class VehicleAssignView(ModelViewSet):
-    queryset = Vehicle.objects.all()
-    serializer_class = VehicleSerializer
+class VehicleAssignView(RetrieveUpdateAPIView):
+    queryset =  Vehicle.objects.select_related('current_driver').all()
+    serializer_class = AssignDriverSerializer
     permission_classes = [IsAuthenticated, IsBranchAdmin]
     filter_backends = [BranchFilterBackend]
 

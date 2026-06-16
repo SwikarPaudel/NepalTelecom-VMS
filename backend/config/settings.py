@@ -128,10 +128,11 @@ USE_I18N = True
 
 USE_TZ = True
 
-SIMPLE_JWT = {
-    'ACCESS_TOKEN_LIFETIME': timedelta(minutes=60),  # Adjust as needed
-    'REFRESH_TOKEN_LIFETIME': timedelta(days=1),     # Adjust as needed
-}
+CORS_ALLOWED_ORIGINS = [
+    "http://localhost:3000",
+    "http://localhost:5173",
+    
+]
 
 SIMPLE_JWT = {
     # Access tokens are sent with every API request (Keep this relatively short)
@@ -145,6 +146,12 @@ SIMPLE_JWT = {
     "BLACKLIST_AFTER_ROTATION": True, # Prevents old refresh tokens from being reused
 }
 
+REST_FRAMEWORK = {
+    'DEFAULT_AUTHENTICATION_CLASSES': (
+        'rest_framework_simplejwt.authentication.JWTAuthentication',
+        'rest_framework.authentication.SessionAuthentication',
+    )
+}
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/6.0/howto/static-files/

@@ -25,6 +25,23 @@ class DriverProfile(models.Model):
 
 
 class Dispatches(models.Model):
-    driver = models.ForeignKey(DriverProfile, on_delete=models.CASCADE, related_name='dispatches')
+
+    class DispatchStatusChoices(models.TextChoices):
+        PENDING = 'PENDING', 'Pending'
+        IN_PROGRESS = 'IN_PROGRESS', 'In Progress'
+        COMPLETED = 'COMPLETED', 'Completed'
+        CANCELLED = 'CANCELLED', 'Cancelled'
+    dispatch_status = models.CharField(max_length=20, choices=DispatchStatusChoices.choices, default=DispatchStatusChoices.PENDING)
+    driver = models.ForeignKey(DriverProfile, on_delete=models.CASCADE, related_name='dispatches',null=True, blank=True)
     vehicle = models.ForeignKey('fleet.Vehicle', on_delete=models.CASCADE)
     booking=models.ForeignKey('bookings.Booking', on_delete=models.CASCADE)
+
+
+    def save(self, *args, **kwargs):
+       if self.dispatch_status == self.DispatchStatusChoices.COMPLETED or self.dispatch_status == self.DispatchStatusChoices.CANCELLED:
+            if self.pk:
+                self.delete()
+            return
+       super().save(*args, **kwargs)
+
+#Need modification to delete the dispatch when the status is completed or cancelled

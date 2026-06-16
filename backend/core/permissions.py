@@ -44,3 +44,28 @@ class IsBranchAdmin(permissions.BasePermission):
             and getattr(profile, 'role', None) == Profile.ROLE.ADMIN
             and getattr(profile, 'role_approved', False)
         )
+
+
+class IsDriver(permissions.BasePermission):
+    message = 'Driver access required.'
+
+    def has_permission(self, request, view):
+        user = request.user
+        
+        # 1. Always check authentication FIRST to eliminate AnonymousUser crashes
+        if not user or not user.is_authenticated:
+            return False
+
+        # 2. Safely authorize master command-line superusers
+        if user.is_superuser:
+            return True
+
+        # 3. Fall back to checking your custom Profile tables
+        profile = getattr(user, 'profile', None)
+        return (
+            profile is not None
+            and getattr(profile, 'role', None) == Profile.ROLE.DRIVER
+            and getattr(profile, 'role_approved', False)
+        )
+    
+    

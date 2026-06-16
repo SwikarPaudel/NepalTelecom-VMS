@@ -22,7 +22,7 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('api-auth/', include('rest_framework.urls')),
     path('api/login/', LoginView.as_view(), name='login'),
-    path('api/userprofile/', include('profile.urls')),
+    path('api/userprofile/', include('accounts.urls')),
     path('api/vehicles/', include('fleet.urls')),
     path('api/driver/', include('driver.urls')),
     path('api/booking/', include('bookings.urls')),

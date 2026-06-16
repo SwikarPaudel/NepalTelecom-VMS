@@ -24,7 +24,7 @@ class DriverProfile(models.Model):
         return f"Driver: {self.user_id} - {self.driver_status}"
 
 
-# class Dispatches(models.Model):
-#     driver = models.ForeignKey(DriverProfile, on_delete=models.CASCADE, related_name='dispatches')
-#     vehicle = models.ForeignKey('fleet.Vehicle', on_delete=models.CASCADE)
-#     booking=models.ForeignKey('bookings.Booking', on_delete=models.CASCADE)
+class Dispatches(models.Model):
+    driver = models.ForeignKey(DriverProfile, on_delete=models.CASCADE, related_name='dispatches')
+    vehicle = models.ForeignKey('fleet.Vehicle', on_delete=models.CASCADE)
+    booking=models.ForeignKey('bookings.Booking', on_delete=models.CASCADE)
